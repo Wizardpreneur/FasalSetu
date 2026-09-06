@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FasalSetu — Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#F3EFE3;
+    --surface:#FFFFFF;
+    --ink:#1E2A1F;
+    --ink-soft:#5B6459;
+    --mustard:#C98A2B;
+    --mustard-deep:#A66E1E;
+    --green:#2F5233;
+    --green-soft:#E4EBE2;
+    --indigo:#26344D;
+    --line:#DDD3BE;
+    --danger:#B3492B;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:'Inter',sans-serif;
+    display:flex; justify-content:center;
+  }
+  .phone{
+    width:100%; max-width:430px; min-height:100vh;
+    background:var(--surface);
+    display:flex; flex-direction:column;
+    box-shadow:0 0 40px rgba(0,0,0,0.08);
+    position:relative;
+  }
+
+  /* ---- Ticker (hero) ---- */
+  .ticker-wrap{
+    background:var(--ink); color:var(--bg);
+    overflow:hidden; white-space:nowrap; padding:10px 0;
+    border-bottom:3px solid var(--mustard);
+  }
+  .ticker{
+    display:inline-block; padding-left:100%;
+    animation:scroll 22s linear infinite;
+    font-family:'Zilla Slab',serif; font-size:14px; letter-spacing:.02em;
+  }
+  .ticker span{ margin-right:36px; }
+  .ticker b{ color:var(--mustard); font-weight:700; }
+  @keyframes scroll{ 0%{transform:translateX(0);} 100%{transform:translateX(-100%);} }
+
+  header.top{
+    padding:18px 20px 14px; border-bottom:1px solid var(--line);
+  }
+  header.top .brand{
+    font-family:'Zilla Slab',serif; font-weight:700; font-size:22px;
+    display:flex; align-items:center; gap:8px;
+  }
+  header.top .brand .dot{ width:10px; height:10px; border-radius:50%; background:var(--green); display:inline-block;}
+  header.top .sub{ color:var(--ink-soft); font-size:13px; margin-top:2px; }
+
+  main{ flex:1; padding:18px 20px 90px; }
+  .view{ display:none; animation:fade .25s ease; }
+  .view.active{ display:block; }
+  @keyframes fade{ from{opacity:0; transform:translateY(4px);} to{opacity:1; transform:translateY(0);} }
+
+  h2.section-title{
+    font-family:'Zilla Slab',serif; font-size:19px; margin:0 0 4px;
+  }
+  p.section-hint{ color:var(--ink-soft); font-size:13px; margin:0 0 16px; line-height:1.5;}
+
+  .card{
+    background:var(--surface); border:1px solid var(--line); border-radius:10px;
+    padding:16px; margin-bottom:14px;
+  }
+  label{ display:block; font-size:12.5px; color:var(--ink-soft); margin-bottom:5px; margin-top:12px;}
+  label:first-child{ margin-top:0; }
+  select, input[type=text], input[type=number]{
+    width:100%; padding:10px 12px; border:1px solid var(--line); border-radius:7px;
+    font-family:'Inter',sans-serif; font-size:14.5px; background:var(--bg); color:var(--ink);
+  }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:6px;
+    background:var(--green); color:#fff; border:none; border-radius:7px;
+    padding:11px 16px; font-size:14px; font-weight:600; cursor:pointer;
+    width:100%; margin-top:16px; font-family:'Inter',sans-serif;
+  }
+  .btn:active{ transform:scale(.98); }
+  .btn.secondary{ background:transparent; color:var(--green); border:1px solid var(--green); }
+  .btn.mustard{ background:var(--mustard); }
+  .row2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+  .channel-row{ display:flex; gap:10px; margin-top:10px; }
+  .channel-row .btn{ margin-top:0; font-size:12.5px; padding:9px 8px; }
+
+  .chat-bubble{
+    background:var(--green-soft); border-radius:10px; padding:12px 14px; font-size:13.5px;
+    margin-top:12px; line-height:1.5; color:var(--ink);
+  }
+  .chat-bubble.me{ background:#fff; border:1px solid var(--line); }
+
+  /* Forecast chart */
+  .chart{ display:flex; align-items:flex-end; gap:8px; height:140px; margin:14px 0 6px;}
+  .bar{ flex:1; background:var(--mustard); border-radius:5px 5px 0 0; position:relative; }
+  .bar.future{ background:var(--green); }
+  .bar .val{ position:absolute; top:-18px; left:0; right:0; text-align:center; font-size:10.5px; color:var(--ink-soft); }
+  .chart-labels{ display:flex; gap:8px; }
+  .chart-labels span{ flex:1; text-align:center; font-size:10.5px; color:var(--ink-soft); }
+  .callout{
+    background:var(--green); color:#fff; border-radius:8px; padding:12px 14px; font-size:13.5px;
+    margin-top:14px; line-height:1.5;
+  }
+  .callout b{ color:#F3EFE3; }
+
+  /* Grading */
+  .upload-box{
+    border:2px dashed var(--line); border-radius:10px; padding:26px 14px; text-align:center;
+    color:var(--ink-soft); font-size:13.5px; cursor:pointer; position:relative; overflow:hidden;
+  }
+  .upload-box input{ position:absolute; inset:0; opacity:0; cursor:pointer; }
+  .preview{ width:100%; max-height:160px; object-fit:cover; border-radius:8px; margin-top:12px; display:none;}
+  .grade-result{ display:none; margin-top:14px; }
+  .grade-pill{
+    display:inline-block; padding:5px 12px; border-radius:20px; font-weight:700; font-size:13px;
+    background:var(--mustard); color:#fff;
+  }
+  .confidence-track{ background:var(--line); border-radius:6px; height:8px; margin-top:10px; overflow:hidden;}
+  .confidence-fill{ background:var(--green); height:100%; width:0%; transition:width .8s ease; }
+
+  /* Orders */
+  .order-card .head{ display:flex; justify-content:space-between; align-items:baseline; }
+  .order-card .crop{ font-family:'Zilla Slab',serif; font-size:16px; font-weight:600; }
+  .order-card .price{ color:var(--green); font-weight:700; font-size:14px;}
+  .stepper{ display:flex; margin-top:16px; }
+  .step{ flex:1; text-align:center; position:relative; font-size:10.5px; color:var(--ink-soft); }
+  .step .node{ width:16px; height:16px; border-radius:50%; background:var(--line); margin:0 auto 6px; }
+  .step.done .node{ background:var(--green); }
+  .step.current .node{ background:var(--mustard); box-shadow:0 0 0 4px rgba(201,138,43,.25); }
+  .step:not(:last-child)::after{
+    content:''; position:absolute; top:8px; left:58%; width:84%; height:2px; background:var(--line); z-index:0;
+  }
+  .step.done:not(:last-child)::after{ background:var(--green); }
+
+  /* Dashboard */
+  .role-toggle{ display:flex; gap:8px; margin-bottom:16px; }
+  .role-toggle button{
+    flex:1; padding:8px; border-radius:7px; border:1px solid var(--line); background:var(--bg);
+    font-size:13px; font-weight:600; cursor:pointer; color:var(--ink-soft);
+  }
+  .role-toggle button.active{ background:var(--indigo); color:#fff; border-color:var(--indigo); }
+  .stat-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .stat-card{ background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:14px;}
+  .stat-card .num{ font-family:'Zilla Slab',serif; font-size:24px; font-weight:700; }
+  .stat-card .lbl{ font-size:11.5px; color:var(--ink-soft); margin-top:2px;}
+  .stat-card.hi .num{ color:var(--green); }
+
+  /* Bottom nav */
+  nav.bottom{
+    position:fixed; bottom:0; left:50%; transform:translateX(-50%);
+    width:100%; max-width:430px; background:var(--surface); border-top:1px solid var(--line);
+    display:flex; padding:8px 4px 10px;
+  }
+  nav.bottom button{
+    flex:1; background:none; border:none; display:flex; flex-direction:column; align-items:center; gap:3px;
+    color:var(--ink-soft); font-size:10.5px; font-family:'Inter',sans-serif; cursor:pointer; padding:4px 0;
+  }
+  nav.bottom button.active{ color:var(--green); font-weight:700; }
+  nav.bottom svg{ width:20px; height:20px; }
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <div class="ticker-wrap">
+    <div class="ticker" id="ticker"></div>
+  </div>
+
+  <header class="top">
+    <div class="brand"><span class="dot"></span>FasalSetu</div>
+    <div class="sub">Your procurement companion — SIH26033</div>
+  </header>
+
+  <main>
+    <!-- HOME / LIST CROP -->
+    <section class="view active" id="view-home">
+      <h2 class="section-title">List your produce</h2>
+      <p class="section-hint">Tell us what you're selling, in whichever way is easiest for you.</p>
+
+      <div class="card">
+        <label>Crop</label>
+        <select id="cropSelect">
+          <option>Wheat</option>
+          <option>Onion</option>
+          <option>Paddy (Rice)</option>
+          <option>Tomato</option>
+          <option>Soybean</option>
+        </select>
+        <div class="row2">
+          <div>
+            <label>Quantity (quintals)</label>
+            <input type="number" id="qtyInput" placeholder="e.g. 12" value="12">
+          </div>
+          <div>
+            <label>Nearest mandi</label>
+            <select id="mandiSelect">
+              <option>Patiala Mandi</option>
+              <option>Rajpura Mandi</option>
+              <option>Sangrur Mandi</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn" onclick="submitListing()">List this crop</button>
+        <div class="channel-row">
+          <button class="btn secondary" onclick="showChannelDemo('whatsapp')">Try via WhatsApp</button>
+          <button class="btn secondary" onclick="showChannelDemo('voice')">Try via Voice call</button>
+        </div>
+        <div id="channelDemo"></div>
+      </div>
+      <div id="listingConfirm"></div>
+    </section>
+
+    <!-- FORECAST -->
+    <section class="view" id="view-forecast">
+      <h2 class="section-title">Price forecast</h2>
+      <p class="section-hint">Based on recent mandi trends and demand signals for your crop.</p>
+      <div class="card">
+        <select id="forecastCrop" onchange="renderForecast()">
+          <option>Wheat</option>
+          <option>Onion</option>
+          <option>Paddy (Rice)</option>
+        </select>
+        <div class="chart" id="chart"></div>
+        <div class="chart-labels" id="chartLabels"></div>
+        <div class="callout" id="forecastCallout"></div>
+      </div>
+    </section>
+
+    <!-- GRADING -->
+    <section class="view" id="view-grading">
+      <h2 class="section-title">Grading self-check</h2>
+      <p class="section-hint">Upload a photo of your produce to get a rough grade before you arrive at the mandi — fewer disputes at the gate.</p>
+      <div class="card">
+        <div class="upload-box" id="uploadBox">
+          <input type="file" accept="image/*" id="photoInput" onchange="handlePhoto(event)">
+          <span id="uploadLabel">Tap to upload a photo of your produce</span>
+        </div>
+        <img class="preview" id="preview">
+        <div class="grade-result" id="gradeResult">
+          <p style="font-size:13px; color:var(--ink-soft); margin-bottom:6px;">Estimated grade</p>
+          <span class="grade-pill" id="gradePill">Grade A</span>
+          <div class="confidence-track"><div class="confidence-fill" id="confFill"></div></div>
+          <p style="font-size:12px; color:var(--ink-soft); margin-top:8px;">This is a rough self-check, not a final grading decision — the procurement center's officer still confirms grade on arrival.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ORDERS -->
+    <section class="view" id="view-orders">
+      <h2 class="section-title">Your listings</h2>
+      <p class="section-hint">Track status without needing to call anyone.</p>
+
+      <div class="card order-card">
+        <div class="head"><span class="crop">Wheat · 12 qtl</span><span class="price">₹2,340/qtl</span></div>
+        <div class="stepper">
+          <div class="step done"><div class="node"></div>Listed</div>
+          <div class="step done"><div class="node"></div>Graded</div>
+          <div class="step current"><div class="node"></div>Matched</div>
+          <div class="step"><div class="node"></div>Paid</div>
+        </div>
+      </div>
+
+      <div class="card order-card">
+        <div class="head"><span class="crop">Onion · 6 qtl</span><span class="price">₹1,180/qtl</span></div>
+        <div class="stepper">
+          <div class="step done"><div class="node"></div>Listed</div>
+          <div class="step done"><div class="node"></div>Graded</div>
+          <div class="step done"><div class="node"></div>Matched</div>
+          <div class="step current"><div class="node"></div>Paid</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- DASHBOARD -->
+    <section class="view" id="view-dashboard">
+      <h2 class="section-title">Analytics</h2>
+      <p class="section-hint">Same data layer, viewed by farmer or by the procurement office.</p>
+      <div class="role-toggle">
+        <button class="active" id="roleFarmer" onclick="setRole('farmer')">Farmer view</button>
+        <button id="roleGov" onclick="setRole('gov')">Govt / FPO view</button>
+      </div>
+      <div class="stat-grid" id="statGrid"></div>
+    </section>
+  </main>
+
+  <nav class="bottom">
+    <button class="active" onclick="showView('home',this)">🌾<span>List</span></button>
+    <button onclick="showView('forecast',this)">📈<span>Forecast</span></button>
+    <button onclick="showView('grading',this)">📷<span>Grading</span></button>
+    <button onclick="showView('orders',this)">📦<span>Orders</span></button>
+    <button onclick="showView('dashboard',this)">📊<span>Analytics</span></button>
+  </nav>
+</div>
+
+<script>
+// ---------- Ticker ----------
+const prices = [
+  ['Wheat','₹2,340','+1.8%'], ['Onion','₹1,180','-2.1%'], ['Paddy','₹2,050','+0.6%'],
+  ['Tomato','₹960','+4.3%'], ['Soybean','₹4,410','+0.9%']
+];
+document.getElementById('ticker').innerHTML = prices.map(p=>
+  `<span>${p[0]} <b>${p[1]}</b> (${p[2]})</span>`).join('') +
+  prices.map(p=>`<span>${p[0]} <b>${p[1]}</b> (${p[2]})</span>`).join('');
+
+// ---------- Nav ----------
+function showView(id, btn){
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+id).classList.add('active');
+  document.querySelectorAll('nav.bottom button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  if(id==='forecast') renderForecast();
+  if(id==='dashboard') renderStats();
+}
+
+// ---------- Home / listing ----------
+function submitListing(){
+  const crop = document.getElementById('cropSelect').value;
+  const qty = document.getElementById('qtyInput').value;
+  const mandi = document.getElementById('mandiSelect').value;
+  document.getElementById('listingConfirm').innerHTML =
+    `<div class="chat-bubble">✅ Listed <b>${qty} qtl of ${crop}</b> at <b>${mandi}</b>. You'll get an SMS when a slot opens and again when a buyer is matched.</div>`;
+}
+function showChannelDemo(kind){
+  const el = document.getElementById('channelDemo');
+  if(kind==='whatsapp'){
+    el.innerHTML = `
+      <div class="chat-bubble me">Farmer texts: "12 qtl wheat, Patiala mandi"</div>
+      <div class="chat-bubble">FasalSetu bot: Got it — 12 quintals of wheat, listed for Patiala Mandi. Today's average rate there is ₹2,340/qtl. We'll message you when a slot is open.</div>`;
+  } else {
+    el.innerHTML = `
+      <div class="chat-bubble me">🔊 Farmer speaks in Punjabi on a basic phone call</div>
+      <div class="chat-bubble">FasalSetu voice AI: "ਤੁਹਾਡੀ 12 ਕੁਇੰਟਲ ਕਣਕ ਪਟਿਆਲਾ ਮੰਡੀ ਲਈ ਦਰਜ ਹੋ ਗਈ ਹੈ।" (Your 12 quintals of wheat is listed for Patiala Mandi.)</div>`;
+  }
+}
+
+// ---------- Forecast ----------
+const forecastData = {
+  'Wheat':  [2280,2295,2310,2305,2325,2340,2360],
+  'Onion':  [1240,1220,1205,1195,1188,1180,1165],
+  'Paddy (Rice)': [2010,2020,2030,2035,2040,2050,2065]
+};
+function renderForecast(){
+  const crop = document.getElementById('forecastCrop').value;
+  const data = forecastData[crop];
+  const max = Math.max(...data), min = Math.min(...data);
+  const chart = document.getElementById('chart');
+  const labels = document.getElementById('chartLabels');
+  chart.innerHTML = ''; labels.innerHTML='';
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  data.forEach((v,i)=>{
+    const h = 20 + ((v-min)/(max-min||1))*100;
+    const bar = document.createElement('div');
+    bar.className = 'bar' + (i>=5 ? ' future':'');
+    bar.style.height = h+'px';
+    bar.innerHTML = `<span class="val">₹${v}</span>`;
+    chart.appendChild(bar);
+    const lbl = document.createElement('span');
+    lbl.textContent = days[i];
+    labels.appendChild(lbl);
+  });
+  const change = (((data[6]-data[0])/data[0])*100).toFixed(1);
+  const rising = change >= 0;
+  document.getElementById('forecastCallout').innerHTML =
+    `<b>${rising? 'Prices trending up' : 'Prices trending down'} (${rising?'+':''}${change}% this week).</b><br>
+     ${rising ? 'Consider waiting 2–3 days before selling, if storage allows.' : 'Selling sooner may fetch a better rate than waiting.'}`;
+}
+
+// ---------- Grading ----------
+function handlePhoto(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const url = URL.createObjectURL(file);
+  const preview = document.getElementById('preview');
+  preview.src = url; preview.style.display='block';
+  document.getElementById('uploadLabel').textContent = 'Photo received — analyzing…';
+  setTimeout(()=>{
+    const grades = [['Grade A',88],['Grade B',71],['Grade A',93]];
+    const pick = grades[Math.floor(Math.random()*grades.length)];
+    document.getElementById('gradePill').textContent = pick[0];
+    document.getElementById('confFill').style.width = pick[1]+'%';
+    document.getElementById('gradeResult').style.display='block';
+    document.getElementById('uploadLabel').textContent = 'Tap to upload another photo';
+  }, 900);
+}
+
+// ---------- Dashboard ----------
+let currentRole = 'farmer';
+function setRole(role){
+  currentRole = role;
+  document.getElementById('roleFarmer').classList.toggle('active', role==='farmer');
+  document.getElementById('roleGov').classList.toggle('active', role==='gov');
+  renderStats();
+}
+function renderStats(){
+  const farmer = [
+    ['61%','Your income share of final price', true],
+    ['32%','Old average via traders', false],
+    ['3','Slots booked this month', false],
+    ['0','Payment delays this month', true],
+  ];
+  const gov = [
+    ['+29pt','Farmer income share, before → after', true],
+    ['1,240','Farmers onboarded, this district', false],
+    ['18%','Drop in reported grading disputes', true],
+    ['96%','Listings via voice/SMS (no smartphone)', false],
+  ];
+  const data = currentRole==='farmer' ? farmer : gov;
+  document.getElementById('statGrid').innerHTML = data.map(d=>
+    `<div class="stat-card ${d[2]?'hi':''}"><div class="num">${d[0]}</div><div class="lbl">${d[1]}</div></div>`
+  ).join('');
+}
+
+renderForecast();
+renderStats();
+</script>
+</body>
+</html>
